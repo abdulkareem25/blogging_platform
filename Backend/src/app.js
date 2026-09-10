@@ -2,6 +2,8 @@ import express from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import "./config/env.js";
+import errorMiddleware from "./middlewares/error.middleware.js";
+import notFoundMiddleware from "./middlewares/notFound.middleware.js";
 
 
 const app = express();
@@ -17,5 +19,9 @@ app.get("/", (req, res) => {
   res.send("Welcome to the Blogging Platform API");
 });
 
+
+// middlewares
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
 export default app;
