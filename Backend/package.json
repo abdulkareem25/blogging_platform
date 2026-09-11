@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Backend for the Blogging Platform",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "set NODE_ENV=production&& node server.js",
-    "dev": "set NODE_ENV=development&& nodemon server.js"
+    "start": "set NODE_ENV=production&& node src/server.js",
+    "dev": "set NODE_ENV=development&& nodemon src/server.js"
   },
   "keywords": [],
   "author": "",

@@ -2,8 +2,8 @@ import express from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import "./config/env.js";
-import errorMiddleware from "./middlewares/error.middleware.js";
-import notFoundMiddleware from "./middlewares/notFound.middleware.js";
+import errorMiddleware from "./middleware/errorHandler.js";
+import notFoundMiddleware from "./middleware/notFound.js";
 
 
 const app = express();
