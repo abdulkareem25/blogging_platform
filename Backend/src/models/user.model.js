@@ -50,6 +50,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+userSchema.add({
+  deletedAt: {
+    type: Date,
+    default: null,
+    index: true,
+  },
+});
+
 userSchema.virtual("posts", {
   ref: "Post",
   localField: "_id",
