@@ -1,19 +1,5 @@
 import mongoose from "mongoose";
-
-const slugify = (value = "") =>
-  value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "") || "post";
-
-const generateUniqueSlug = (title = "") => {
-  const base = slugify(title);
-  const suffix = Date.now().toString(36);
-  return `${base}-${suffix}`;
-};
+import slugify from "../utils/slugify.js";
 
 const postSchema = new mongoose.Schema(
   {
@@ -34,26 +20,23 @@ const postSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     tags: {
       type: [String],
       default: [],
       validate: {
-        validator: (tags) => tags.every((tag) => tag.length <= 30),
-        message: "Each tag must be 30 characters or fewer.",
+        validator: (tags) => tags.length <= 10 && tags.every((tag) => tag.length <= 30),
+        message: "Posts may contain up to 10 tags, each 30 characters or fewer.",
       },
     },
     slug: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     deletedAt: {
       type: Date,
       default: null,
-      index: true,
     },
   },
   {
@@ -73,8 +56,8 @@ postSchema.virtual("commentCount", {
 postSchema.pre("validate", function (next) {
   if (!this.isModified("title") && this.slug) return next();
 
-  if (!this.slug || this.isModified("title")) {
-    this.slug = generateUniqueSlug(this.title);
+  if (!this.slug) {
+    this.slug = slugify(this.title);
   }
 
   next();

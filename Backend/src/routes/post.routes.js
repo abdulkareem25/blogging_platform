@@ -7,7 +7,11 @@ import {
   updatePost,
 } from "../controllers/post.controller.js";
 import authenticate from "../middleware/authenticate.js";
+import { writeLimiter } from "../middleware/rateLimiter.js";
+import { validateBody, validateQuery } from "../middleware/validate.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { createPostSchema, updatePostSchema } from "../validators/post.validator.js";
+import { postQuerySchema } from "../validators/query.validator.js";
 import commentRoutes from "./comment.routes.js";
 
 const router = Router();
@@ -23,7 +27,8 @@ router.use("/:postId/comments", commentRoutes);
  */
 
 router.get(
-  "/", 
+  "/",
+  validateQuery(postQuerySchema),
   asyncHandler(getPosts)
 );
 
@@ -35,8 +40,10 @@ router.get(
  */
 
 router.post(
-  "/", 
-  authenticate, 
+  "/",
+  authenticate,
+  writeLimiter,
+  validateBody(createPostSchema),
   asyncHandler(createPost)
 );
 
@@ -48,7 +55,7 @@ router.post(
  */
 
 router.get(
-  "/:id", 
+  "/:id",
   asyncHandler(getPostById)
 );
 
@@ -60,8 +67,9 @@ router.get(
  */
 
 router.put(
-  "/:id", 
-  authenticate, 
+  "/:id",
+  authenticate,
+  validateBody(updatePostSchema),
   asyncHandler(updatePost)
 );
 
@@ -73,8 +81,8 @@ router.put(
  */
 
 router.delete(
-  "/:id", 
-  authenticate, 
+  "/:id",
+  authenticate,
   asyncHandler(deletePost)
 );
 

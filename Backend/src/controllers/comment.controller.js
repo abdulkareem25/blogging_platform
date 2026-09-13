@@ -16,6 +16,11 @@ export const addComment = async (req, res) => {
 };
 
 export const deleteComment = async (req, res) => {
-  await deleteCommentService(req.params.commentId, req.user._id, req.user.role);
+  await deleteCommentService(
+    req.params.commentId,
+    req.user._id,
+    req.user.role,
+    req.params.postId
+  );
   return ApiResponse.success(res, 200, "Comment deleted successfully");
 };

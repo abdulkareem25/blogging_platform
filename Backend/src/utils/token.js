@@ -1,17 +1,18 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import config from "../config/index.js";
 
 export const generateTokens = (userId, role) => {
   const accessToken = jwt.sign(
     { _id: userId, role },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "15m" }
+    config.accessTokenSecret,
+    { expiresIn: config.accessTokenExpiry }
   );
 
   const refreshToken = jwt.sign(
     { _id: userId, role },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "7d" }
+    config.refreshTokenSecret,
+    { expiresIn: config.refreshTokenExpiry }
   );
 
   return { accessToken, refreshToken };

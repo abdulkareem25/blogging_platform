@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -64,28 +64,18 @@ userSchema.virtual("posts", {
   foreignField: "author",
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("refreshToken") || !this.refreshToken) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("refreshToken") || !this.refreshToken) return;
 
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.refreshToken = await bcrypt.hash(this.refreshToken, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  const salt = await bcrypt.genSalt(12);
+  this.refreshToken = await bcrypt.hash(this.refreshToken, salt);
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {

@@ -6,7 +6,10 @@ import {
   registerUser,
 } from "../controllers/auth.controller.js";
 import authenticate from "../middleware/authenticate.js";
+import { authLimiter } from "../middleware/rateLimiter.js";
+import { validateBody } from "../middleware/validate.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { loginSchema, registerSchema } from "../validators/auth.validator.js";
 
 const router = Router();
 
@@ -19,6 +22,8 @@ const router = Router();
 
 router.post(
   "/register",
+  authLimiter,
+  validateBody(registerSchema),
   asyncHandler(registerUser)
 );
 
@@ -32,6 +37,8 @@ router.post(
 
 router.post(
   "/login",
+  authLimiter,
+  validateBody(loginSchema),
   asyncHandler(loginUser)
 );
 

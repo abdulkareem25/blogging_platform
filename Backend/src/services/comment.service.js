@@ -27,7 +27,7 @@ export const getComments = async (postId, query = {}) => {
 
   const [comments, totalItems] = await Promise.all([
     Comment.find({ post: postId })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .populate("author", "username avatar")
@@ -64,7 +64,7 @@ export const addComment = async (postId, authorId, payload = {}) => {
   return comment;
 };
 
-export const deleteComment = async (commentId, userId, role) => {
+export const deleteComment = async (commentId, userId, role, postId) => {
   const comment = await Comment.findById(commentId);
 
   if (!comment) {
@@ -73,6 +73,10 @@ export const deleteComment = async (commentId, userId, role) => {
 
   if (!comment.author.equals(userId) && role !== "admin") {
     throw new ApiError(403, "Forbidden");
+  }
+
+  if (postId && !comment.post.equals(postId)) {
+    throw new ApiError(404, "Comment not found");
   }
 
   await comment.deleteOne();

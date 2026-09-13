@@ -1,12 +1,11 @@
 import app from "./app.js";
 import connectDB from "./config/db.js";
-
-const PORT = process.env.PORT;
+import config from "./config/index.js";
 
 // Connect to MongoDB
-connectDB();
+await connectDB();
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
+app.listen(config.port, () => {
+  console.log(`Server is running on port: ${config.port}`);
 });

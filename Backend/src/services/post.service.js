@@ -97,7 +97,7 @@ export const updatePost = async (postId, userId, role, payload = {}) => {
     throw new ApiError(404, "Post not found");
   }
 
-  if (!post.author.equals(userId) && role !== "admin") {
+  if (!post.author.equals(userId)) {
     throw new ApiError(403, "Forbidden");
   }
 

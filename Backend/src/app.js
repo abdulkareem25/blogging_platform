@@ -1,7 +1,10 @@
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import express from "express";
+import mongoSanitize from "express-mongo-sanitize";
+import helmet from "helmet";
 import morgan from "morgan";
-import "./config/env.js";
+import config from "./config/index.js";
 import errorMiddleware from "./middleware/errorHandler.js";
 import notFoundMiddleware from "./middleware/notFound.js";
 import apiRoutes from "./routes/index.js";
@@ -10,6 +13,14 @@ const app = express();
 
 // Middleware
 app.use(morgan("dev"));
+app.use(helmet());
+app.use(cors({ origin: config.corsOrigin, credentials: true }));
+app.use((req, res, next) => {
+  [req.body, req.params, req.headers, req.query]
+    .filter(Boolean)
+    .forEach((value) => mongoSanitize.sanitize(value));
+  next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

@@ -1,15 +1,22 @@
+import jwt from "jsonwebtoken";
+import config from "../config/index.js";
+import ApiError from "../utils/ApiError.js";
+
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({
-      success: false,
-      message: "Authentication required",
-    });
+    return next(new ApiError(401, "Authentication required"));
   }
 
-  req.user = { id: "demo-user-id", role: "user" };
-  return next();
+  const token = authHeader.slice("Bearer ".length).trim();
+
+  try {
+    req.user = jwt.verify(token, config.accessTokenSecret);
+    return next();
+  } catch {
+    return next(new ApiError(401, "Invalid or expired token"));
+  }
 };
 
 export default authenticate;

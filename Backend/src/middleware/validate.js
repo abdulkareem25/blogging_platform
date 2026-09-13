@@ -1,36 +1,33 @@
-const validateBody = (schema) => (req, res, next) => {
-  const { error } = schema.validate(req.body, { abortEarly: false });
+import ApiError from "../utils/ApiError.js";
+
+const validate = (schema, property) => (req, res, next) => {
+  const { error, value } = schema.validate(req[property], {
+    abortEarly: false,
+    allowUnknown: false,
+    stripUnknown: true,
+  });
 
   if (error) {
-    return res.status(400).json({
-      success: false,
-      message: "Validation failed",
-      errors: error.details.map((detail) => ({
+    return next(new ApiError(
+      400,
+      "Validation failed",
+      error.details.map((detail) => ({
         field: detail.path.join("."),
         message: detail.message,
-      })),
-    });
+      }))
+    ));
   }
 
+  Object.defineProperty(req, property, {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    value,
+  });
   return next();
 };
 
-const validateQuery = (schema) => (req, res, next) => {
-  const { error } = schema.validate(req.query, { abortEarly: false });
+export const validateBody = (schema) => validate(schema, "body");
+export const validateQuery = (schema) => validate(schema, "query");
 
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: "Query validation failed",
-      errors: error.details.map((detail) => ({
-        field: detail.path.join("."),
-        message: detail.message,
-      })),
-    });
-  }
-
-  return next();
-};
-
-export { validateBody, validateQuery };
-export default { validateBody, validateQuery };
+export default validate;

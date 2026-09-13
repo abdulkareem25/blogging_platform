@@ -1,11 +1,20 @@
 import { Router } from "express";
+import Joi from "joi";
 import {
   getCurrentUser,
   getUserPosts,
   updateCurrentUser,
 } from "../controllers/user.controller.js";
 import authenticate from "../middleware/authenticate.js";
+import { validateBody, validateQuery } from "../middleware/validate.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { paginatedQuerySchema } from "../validators/query.validator.js";
+
+const profileSchema = Joi.object({
+  username: Joi.string().trim().pattern(/^[a-zA-Z0-9_]+$/).min(3).max(30),
+  bio: Joi.string().trim().max(300),
+  avatar: Joi.string().trim().uri().allow(""),
+}).min(1);
 
 const router = Router();
 
@@ -16,8 +25,9 @@ const router = Router();
  */
 
 router.get(
-  "/me", 
-  authenticate, 
+  "/me",
+  authenticate,
+  validateBody(profileSchema),
   asyncHandler(getCurrentUser)
 );
 
@@ -29,8 +39,8 @@ router.get(
  */
 
 router.put(
-  "/me", 
-  authenticate, 
+  "/me",
+  authenticate,
   asyncHandler(updateCurrentUser)
 );
 
@@ -41,7 +51,8 @@ router.put(
  */
 
 router.get(
-  "/:id/posts", 
+  "/:id/posts",
+  validateQuery(paginatedQuerySchema),
   asyncHandler(getUserPosts)
 );
 

@@ -67,6 +67,12 @@ export const updateCurrentUser = async (userId, payload = {}) => {
 };
 
 export const getUserPosts = async (userId, query = {}) => {
+  const user = await User.findOne({ _id: userId, deletedAt: null });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
   const page = Number(query.page) || 1;
   const limit = Math.min(Number(query.limit) || 10, 50);
 

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import config from "../config/index.js";
 import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import { compareToken, generateTokens } from "../utils/token.js";
@@ -76,7 +77,7 @@ export const refreshUserToken = async (refreshToken) => {
   let payload;
 
   try {
-    payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    payload = jwt.verify(refreshToken, config.refreshTokenSecret);
   } catch (error) {
     throw new ApiError(401, "Invalid or expired refresh token");
   }

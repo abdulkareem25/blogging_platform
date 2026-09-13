@@ -5,7 +5,11 @@ import {
   getComments,
 } from "../controllers/comment.controller.js";
 import authenticate from "../middleware/authenticate.js";
+import { writeLimiter } from "../middleware/rateLimiter.js";
+import { validateBody, validateQuery } from "../middleware/validate.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { createCommentSchema } from "../validators/comment.validator.js";
+import { paginatedQuerySchema } from "../validators/query.validator.js";
 
 const router = Router({ mergeParams: true });
 
@@ -17,6 +21,7 @@ const router = Router({ mergeParams: true });
 
 router.get(
   "/",
+  validateQuery(paginatedQuerySchema),
   asyncHandler(getComments)
 );
 
@@ -29,7 +34,10 @@ router.get(
 
 router.post(
   "/",
-  authenticate, asyncHandler(addComment)
+  authenticate,
+  writeLimiter,
+  validateBody(createCommentSchema),
+  asyncHandler(addComment)
 );
 
 
