@@ -29,7 +29,7 @@ router.get(
  * @route   POST /comments
  * @desc    Add a new comment to a specific post
  * @access  Private
- * @body    { content }
+ * @body    { body }
  */
 
 router.post(

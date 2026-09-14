@@ -53,14 +53,12 @@ postSchema.virtual("commentCount", {
   count: true,
 });
 
-postSchema.pre("validate", function (next) {
-  if (!this.isModified("title") && this.slug) return next();
+postSchema.pre("validate", function () {
+  if (!this.isModified("title") && this.slug) return;
 
   if (!this.slug) {
     this.slug = slugify(this.title);
   }
-
-  next();
 });
 
 postSchema.index({ author: 1 });

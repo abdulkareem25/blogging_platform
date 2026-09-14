@@ -36,7 +36,7 @@ router.get(
  * @route   POST /posts
  * @desc    Create a new post
  * @access  Private
- * @body    { title, content }
+ * @body    { title, body, tags }
  */
 
 router.post(
