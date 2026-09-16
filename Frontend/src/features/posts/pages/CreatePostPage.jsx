@@ -1,32 +1,43 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { setToast } from "../../ui/store/uiSlice";
 import { createPost } from "../services/posts.api";
+import { postSchema } from "../validators/postSchema";
 
 export default function CreatePostPage() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ title: "", body: "", tags: "" });
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setBusy(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(postSchema),
+    defaultValues: { title: "", body: "", tags: "" },
+  });
+
+  const onSubmit = async (values) => {
     setError("");
 
     try {
       const payload = {
-        title: form.title.trim(),
-        body: form.body.trim(),
-        tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+        title: values.title.trim(),
+        body: values.body.trim(),
+        tags: values.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
       };
 
       const { data } = await createPost(payload);
       const post = data.data.post;
+      dispatch(setToast({ title: "Story published", message: "Your post is live.", type: "success" }));
       navigate(`/posts/${post.slug || post._id}`);
     } catch (err) {
       setError(err?.response?.data?.message || "Unable to publish the post.");
-    } finally {
-      setBusy(false);
+      dispatch(setToast({ title: "Publish failed", message: setError || "Unable to publish the post.", type: "error" }));
     }
   };
 
@@ -35,27 +46,29 @@ export default function CreatePostPage() {
       <p className="eyebrow">WRITE</p>
       <h1>Create a story</h1>
 
-      <form className="editor-form" onSubmit={handleSubmit}>
+      <form className="editor-form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <label>
           Title
-          <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} />
+          <input {...register("title")} />
+          {errors.title && <span className="field-error">{errors.title.message}</span>}
         </label>
 
         <label>
           Body
-          <textarea value={form.body} onChange={(event) => setForm((current) => ({ ...current, body: event.target.value }))} />
+          <textarea {...register("body")} />
+          {errors.body && <span className="field-error">{errors.body.message}</span>}
         </label>
 
         <label>
           Tags
-          <input value={form.tags} onChange={(event) => setForm((current) => ({ ...current, tags: event.target.value }))} placeholder="design, writing, product" />
+          <input {...register("tags")} placeholder="design, writing, product" />
         </label>
 
         {error && <p className="form-error">{error}</p>}
 
         <div className="form-actions">
-          <button type="submit" className="button button-dark" disabled={busy}>
-            {busy ? "Publishing..." : "Publish story"}
+          <button type="submit" className="button button-dark" disabled={isSubmitting}>
+            {isSubmitting ? "Publishing..." : "Publish story"}
           </button>
           <Link className="read-link" to="/">Cancel</Link>
         </div>

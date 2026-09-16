@@ -1,29 +1,62 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../../components/common/Spinner";
 import { useComments } from "../../comments/hooks/useComments";
+import { addComment, deleteComment } from "../../comments/services/comments.api";
+import { commentSchema } from "../../comments/validators/commentSchema";
+import { setToast } from "../../ui/store/uiSlice";
 import { usePost } from "../hooks/usePost";
 import { deletePost } from "../services/posts.api";
 
 export default function PostDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
   const { post, status: postStatus, error: postError } = usePost(id);
-  const { comments, status: commentsStatus } = useComments(id, { page: 1, limit: 20 });
+  const { comments, status: commentsStatus, setComments } = useComments(id, { page: 1, limit: 20 });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(commentSchema),
+    defaultValues: { body: "" },
+  });
 
   const isOwner = currentUser && post && String(currentUser._id) === String(post.author?._id || post.author);
   const canDelete = isOwner || currentUser?.role === "admin";
+
+  const handleAddComment = async (values) => {
+    const { data } = await addComment(id, { body: values.body });
+    setComments((current) => [data.data.comment, ...current]);
+    reset();
+    dispatch(setToast({ title: "Comment added", message: "Your comment is live.", type: "success" }));
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Delete this comment?")) return;
+
+    await deleteComment(id, commentId);
+    setComments((current) => current.filter((comment) => comment._id !== commentId));
+    dispatch(setToast({ title: "Comment deleted", message: "The comment was removed.", type: "success" }));
+  };
 
   const handleDelete = async () => {
     if (!post || !window.confirm("Delete this post? This action cannot be undone.")) return;
 
     try {
       await deletePost(post._id);
+      dispatch(setToast({ title: "Story deleted", message: "The post has been removed.", type: "success" }));
       navigate("/");
     } catch (error) {
       console.error(error);
+      dispatch(setToast({ title: "Delete failed", message: "Unable to delete this story.", type: "error" }));
     }
   };
 
@@ -104,9 +137,32 @@ export default function PostDetailPage() {
                   <span>{new Date(comment.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
                 </div>
                 <p>{comment.body}</p>
+                {(currentUser && (String(currentUser._id) === String(comment.author?._id || comment.author) || currentUser.role === "admin")) && (
+                  <div className="comment-actions">
+                    <button type="button" className="button button-secondary delete-button" onClick={() => handleDeleteComment(comment._id)}>
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
+        )}
+
+        {currentUser ? (
+          <form className="comment-form" onSubmit={handleSubmit(handleAddComment)} noValidate>
+            <label>
+              Add a comment
+              <textarea {...register("body")} placeholder="Write a thoughtful response..." />
+              {errors.body && <span className="field-error">{errors.body.message}</span>}
+            </label>
+
+            <button type="submit" className="button button-dark" disabled={isSubmitting}>
+              {isSubmitting ? "Posting..." : "Post comment"}
+            </button>
+          </form>
+        ) : (
+          <p className="status-note">Sign in to join the conversation.</p>
         )}
       </section>
     </main>

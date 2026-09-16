@@ -1,14 +1,28 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { setToast } from "../../ui/store/uiSlice";
 import { getPostById, updatePost } from "../services/posts.api";
+import { postSchema } from "../validators/postSchema";
 
 export default function EditPostPage() {
+  const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ title: "", body: "", tags: "" });
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(postSchema),
+    defaultValues: { title: "", body: "", tags: "" },
+  });
 
   useEffect(() => {
     let active = true;
@@ -17,11 +31,9 @@ export default function EditPostPage() {
       .then(({ data }) => {
         if (!active) return;
         const post = data.data.post;
-        setForm({
-          title: post.title,
-          body: post.body,
-          tags: (post.tags || []).join(", "),
-        });
+        setValue("title", post.title || "");
+        setValue("body", post.body || "");
+        setValue("tags", (post.tags || []).join(", "));
         setStatus("ready");
       })
       .catch(() => {
@@ -35,22 +47,20 @@ export default function EditPostPage() {
     };
   }, [id]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setBusy(true);
+  const onSubmit = async (values) => {
     setError("");
 
     try {
       await updatePost(id, {
-        title: form.title.trim(),
-        body: form.body.trim(),
-        tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+        title: values.title.trim(),
+        body: values.body.trim(),
+        tags: values.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
       });
+      dispatch(setToast({ title: "Story updated", message: "Your changes were saved.", type: "success" }));
       navigate(`/posts/${id}`);
     } catch (err) {
       setError(err?.response?.data?.message || "Unable to update this post.");
-    } finally {
-      setBusy(false);
+      dispatch(setToast({ title: "Update failed", message: err?.response?.data?.message || "Unable to update this post.", type: "error" }));
     }
   };
 
@@ -67,27 +77,29 @@ export default function EditPostPage() {
       <p className="eyebrow">EDIT</p>
       <h1>Update your story</h1>
 
-      <form className="editor-form" onSubmit={handleSubmit}>
+      <form className="editor-form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <label>
           Title
-          <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} />
+          <input {...register("title")} />
+          {errors.title && <span className="field-error">{errors.title.message}</span>}
         </label>
 
         <label>
           Body
-          <textarea value={form.body} onChange={(event) => setForm((current) => ({ ...current, body: event.target.value }))} />
+          <textarea {...register("body")} />
+          {errors.body && <span className="field-error">{errors.body.message}</span>}
         </label>
 
         <label>
           Tags
-          <input value={form.tags} onChange={(event) => setForm((current) => ({ ...current, tags: event.target.value }))} placeholder="design, writing, product" />
+          <input {...register("tags")} placeholder="design, writing, product" />
         </label>
 
         {error && <p className="form-error">{error}</p>}
 
         <div className="form-actions">
-          <button type="submit" className="button button-dark" disabled={busy}>
-            {busy ? "Saving..." : "Save changes"}
+          <button type="submit" className="button button-dark" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save changes"}
           </button>
           <Link className="read-link" to={`/posts/${id}`}>Cancel</Link>
         </div>

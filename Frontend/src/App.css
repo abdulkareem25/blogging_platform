@@ -335,6 +335,255 @@ em {
   font: 12px Arial, sans-serif;
 }
 
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
+  min-width: 280px;
+  max-width: 360px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 18px 42px rgba(38, 48, 45, 0.12);
+}
+
+.toast-success {
+  border-color: rgba(54, 127, 92, 0.45);
+}
+
+.toast-error {
+  border-color: rgba(200, 93, 63, 0.35);
+}
+
+.toast-icon {
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+
+.toast-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  font: 12px Arial, sans-serif;
+  color: var(--muted);
+}
+
+.toast-copy strong {
+  color: var(--ink);
+}
+
+.toast-close {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.editor-form,
+.comment-form {
+  display: grid;
+  gap: 24px;
+  max-width: 780px;
+}
+
+.editor-form label,
+.comment-form label {
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+}
+
+.editor-form input,
+.editor-form textarea,
+.comment-form textarea {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 10px 0;
+  color: var(--ink);
+  outline: 0;
+  resize: vertical;
+}
+
+.editor-form textarea,
+.comment-form textarea {
+  min-height: 160px;
+}
+
+.editor-form input:focus,
+.editor-form textarea:focus,
+.comment-form textarea:focus {
+  border-color: var(--accent);
+}
+
+.form-page h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  letter-spacing: -3px;
+  margin-bottom: 24px;
+}
+
+.form-actions,
+.post-actions,
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.post-detail-page {
+  display: grid;
+  gap: 30px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.post-detail-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 32px;
+}
+
+.post-details-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.post-details-header h1 {
+  font-size: clamp(38px, 5vw, 68px);
+  letter-spacing: -2px;
+}
+
+.author-row {
+  margin-bottom: 16px;
+}
+
+.detail-tags {
+  margin-bottom: 24px;
+}
+
+.post-body {
+  color: var(--ink);
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 18px;
+}
+
+.comments-panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 26px 32px;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.comment-header span {
+  color: var(--muted);
+}
+
+.comment-list {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.comment-item {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.comment-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.comment-item p {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.comment-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.delete-button {
+  color: var(--accent);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--paper);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 18px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-table th {
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.admin-table td {
+  color: var(--ink);
+}
+
+.profile-page {
+  max-width: 760px;
+}
+
+.profile-actions {
+  margin-top: 18px;
+}
+
 .auth-page {
   max-width: 1180px;
   margin: auto;

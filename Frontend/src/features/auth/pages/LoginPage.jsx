@@ -1,26 +1,37 @@
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { setToast } from "../../ui/store/uiSlice";
 import { loginUser } from "../store/authSlice";
+import { loginSchema } from "../validators/loginSchema";
 
 export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const error = useSelector((state) => state.auth.error);
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [busy, setBusy] = useState(false);
 
-  const submit = async (event) => {
-    event.preventDefault();
-    setBusy(true);
-    const result = await dispatch(loginUser(form));
-    setBusy(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
+
+  const submit = async (values) => {
+    const result = await dispatch(loginUser(values));
 
     if (!result.error) {
+      dispatch(setToast({ title: "Welcome back", message: "Signed in successfully.", type: "success" }));
       const redirect = location.state?.from?.pathname || "/";
       navigate(redirect, { replace: true });
+      return;
     }
+
+    dispatch(setToast({ title: "Sign in failed", message: result.error?.message || "Unable to sign in.", type: "error" }));
   };
 
   return (
@@ -34,31 +45,23 @@ export default function LoginPage() {
         </h1>
       </div>
 
-      <form className="auth-form" onSubmit={submit}>
+      <form className="auth-form" onSubmit={handleSubmit(submit)} noValidate>
         <label>
           Email
-          <input
-            type="email"
-            required
-            value={form.email}
-            onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-          />
+          <input type="email" {...register("email")} />
+          {errors.email && <span className="field-error">{errors.email.message}</span>}
         </label>
 
         <label>
           Password
-          <input
-            type="password"
-            required
-            value={form.password}
-            onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
-          />
+          <input type="password" {...register("password")} />
+          {errors.password && <span className="field-error">{errors.password.message}</span>}
         </label>
 
         {error && <p className="form-error">{error}</p>}
 
-        <button className="button button-dark" disabled={busy} type="submit">
-          {busy ? "Signing in..." : "Sign in"}
+        <button className="button button-dark" disabled={isSubmitting} type="submit">
+          {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
 
         <p className="form-foot">
