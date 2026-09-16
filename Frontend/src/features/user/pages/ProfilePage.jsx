@@ -9,11 +9,7 @@ export default function ProfilePage() {
       <p className="eyebrow">YOUR SPACE</p>
       <h1>{user?.username || "Profile"}</h1>
       <p>{user?.bio || "Your profile is ready for a little context."}</p>
-
-      <div className="profile-actions">
-        <Link className="button button-dark" to="/profile/edit">Edit profile</Link>
-        <Link className="button button-secondary" to="/">Return to journal</Link>
-      </div>
+      <Link className="button button-dark" to="/">Return to journal</Link>
     </main>
   );
 }

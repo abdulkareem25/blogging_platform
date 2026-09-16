@@ -8,8 +8,11 @@ import NotFoundPage from "../features/auth/pages/NotFoundPage";
 import ProfilePage from "../features/auth/pages/ProfilePage";
 import RegisterPage from "../features/auth/pages/RegisterPage";
 import CreatePostPage from "../features/posts/pages/CreatePostPage";
+import EditPostPage from "../features/posts/pages/EditPostPage";
 import PostDetailPage from "../features/posts/pages/PostDetailPage";
 import PostsPage from "../features/posts/pages/PostsPage";
+import EditProfilePage from "../features/user/pages/EditProfilePage";
+import UserPostsPage from "../features/user/pages/UserPostsPage";
 import AdminRoute from "./AdminRoute";
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -27,10 +30,13 @@ export default function AppRoutes() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/posts/new" element={<CreatePostPage />} />
+          <Route path="/posts/:id/edit" element={<EditPostPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/edit" element={<EditProfilePage />} />
         </Route>
 
         <Route path="/posts/:id" element={<PostDetailPage />} />
+        <Route path="/users/:id/posts" element={<UserPostsPage />} />
 
         <Route element={<GuestOnly />}>
           <Route path="/login" element={<LoginPage />} />
