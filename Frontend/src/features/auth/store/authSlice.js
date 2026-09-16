@@ -21,7 +21,12 @@ export const logoutUser = createAsyncThunk("auth/logout", async (_, { dispatch }
   dispatch(clearAuth());
 });
 
-const initialState = { user: null, accessToken: null, status: "loading", error: null };
+const initialState = { 
+  user: null, 
+  accessToken: null, 
+  status: "loading", 
+  error: null 
+};
 
 const authSlice = createSlice({
   name: "auth",

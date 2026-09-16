@@ -292,8 +292,47 @@ em {
   color: var(--paper);
 }
 
+.button-secondary {
+  background: transparent;
+  color: var(--dark);
+  border: 1px solid var(--line);
+}
+
 .button-small {
   padding: 10px 15px;
+}
+
+.field-group {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+}
+
+.field-group input,
+.field-group textarea {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 10px 0;
+  outline: 0;
+  color: var(--ink);
+}
+
+.field-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.field-group input:focus,
+.field-group textarea:focus {
+  border-color: var(--accent);
+}
+
+.field-error {
+  color: var(--accent);
+  font: 12px Arial, sans-serif;
 }
 
 .auth-page {
